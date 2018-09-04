@@ -1,4 +1,4 @@
-package it.stez78.bandmates;
+package it.stez78.bandmates.app.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import it.stez78.bandmates.model.Bandmate;
+import it.stez78.bandmates.R;
 
 /**
  * Created by Stefano Zanotti on 03/09/2018.

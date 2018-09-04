@@ -1,4 +1,4 @@
-package it.stez78.bandmates;
+package it.stez78.bandmates.model;
 
 import lombok.Data;
 

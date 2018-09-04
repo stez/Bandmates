@@ -1,9 +1,8 @@
-package it.stez78.bandmates;
+package it.stez78.bandmates.app;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +25,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import it.stez78.bandmates.app.adapters.BandmateAdapter;
+import it.stez78.bandmates.model.Bandmate;
+import it.stez78.bandmates.R;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
