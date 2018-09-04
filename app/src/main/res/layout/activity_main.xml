@@ -5,28 +5,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/activity_main_toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark"
-        android:padding="24dp"
-        android:text="BANDMATES"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:elevation="8dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/activity_main_map"
+        android:layout_width="0dp"
+        android:layout_height="161dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_main_toolbar" />
+
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/main_activity_rw"
+        android:id="@+id/activity_main_rw"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/activity_main_map" />
+
+    <Button
+        android:id="@+id/activity_main_login_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Login"
+        android:theme="@style/coloredButtonAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
