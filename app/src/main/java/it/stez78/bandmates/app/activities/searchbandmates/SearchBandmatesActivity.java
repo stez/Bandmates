@@ -1,4 +1,4 @@
-package it.stez78.bandmates.app;
+package it.stez78.bandmates.app.activities.searchbandmates;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,22 +25,21 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
 import it.stez78.bandmates.model.Bandmate;
-import it.stez78.bandmates.R;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SearchBandmatesActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
-
-
-    private final static String TAG = MainActivity.class.getSimpleName();
+    private final static String TAG = SearchBandmatesActivity.class.getSimpleName();
 
     @BindView(R.id.activity_main_toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.activity_main_rw)
     RecyclerView recyclerView;
+
+    private GoogleMap mMap;
 
     private RecyclerView.LayoutManager layoutManager;
     private BandmateAdapter adapter;
@@ -50,8 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.activity_main_map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.activity_main_map);
         mapFragment.getMapAsync(this);
         setSupportActionBar(toolbar);
 
@@ -78,13 +76,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         adapter.notifyDataSetChanged();
 
                     }
-        });
+                });
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));

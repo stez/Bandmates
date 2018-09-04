@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import it.stez78.bandmates.di.AppInjector;
-import timber.log.BuildConfig;
 import timber.log.Timber;
 
 public class BandmatesApplication extends Application implements HasActivityInjector {
