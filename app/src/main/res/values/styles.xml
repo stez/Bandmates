@@ -10,7 +10,7 @@
 
     <style name="coloredButtonAccent" parent="Widget.AppCompat.Button.Colored">
         <item name="android:colorButtonNormal">@color/secondaryColor</item>
-        <item name="android:textColor">@color/primaryDarkColor</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>
