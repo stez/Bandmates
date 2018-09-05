@@ -20,7 +20,7 @@ public class AppInjector {
     private AppInjector() {
     }
 
-    public static void init(BandmatesApplication bandmatesApplication ) {
+    public static void init(BandmatesApplication bandmatesApplication) {
         DaggerAppComponent
                 .builder()
                 .application(bandmatesApplication)

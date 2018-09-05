@@ -1,12 +1,12 @@
 package it.stez78.bandmates.app.activities.searchbandmates;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,24 +14,27 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
+import it.stez78.bandmates.BandmatesAppViewModelFactory;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
 import it.stez78.bandmates.model.Bandmate;
 
-public class SearchBandmatesActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
 
     private final static String TAG = SearchBandmatesActivity.class.getSimpleName();
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
 
     @BindView(R.id.activity_main_toolbar)
     Toolbar toolbar;
@@ -44,6 +47,12 @@ public class SearchBandmatesActivity extends AppCompatActivity implements OnMapR
     private RecyclerView.LayoutManager layoutManager;
     private BandmateAdapter adapter;
 
+    @Inject
+    BandmatesAppViewModelFactory viewModelFactory;
+    private SearchBandmatesViewModel viewModel;
+
+    private List<Bandmate> bandmates = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,28 +64,14 @@ public class SearchBandmatesActivity extends AppCompatActivity implements OnMapR
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        adapter = new BandmateAdapter(bandmates);
+        recyclerView.setAdapter(adapter);
 
-        db.collection("bandmates")
-                .whereEqualTo("publicProfile", true)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "Listen failed.", e);
-                            return;
-                        }
-                        List<Bandmate> bandmates = new ArrayList<>();
-                        for (QueryDocumentSnapshot doc : value) {
-                            Bandmate bandmate = doc.toObject(Bandmate.class);
-                            bandmates.add(bandmate);
-                        }
-                        adapter = new BandmateAdapter(bandmates);
-                        recyclerView.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
-
-                    }
-                });
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);
+        viewModel.bandmatesLiveData().observe(this, bandmate -> {
+            bandmates.add(bandmate);
+            adapter.notifyDataSetChanged();
+        });
     }
 
     @Override
@@ -85,5 +80,10 @@ public class SearchBandmatesActivity extends AppCompatActivity implements OnMapR
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
+        return dispatchingAndroidInjector;
     }
 }
