@@ -3,27 +3,39 @@ package it.stez78.bandmates.app.activities.searchbandmates;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import it.stez78.bandmates.BandmatesAppViewModelFactory;
@@ -34,6 +46,7 @@ import it.stez78.bandmates.model.Bandmate;
 public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
 
     private final static String TAG = SearchBandmatesActivity.class.getSimpleName();
+    private final static int RC_SIGN_IN = 1;
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
@@ -43,6 +56,9 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
     @BindView(R.id.activity_search_bandmates_rw)
     RecyclerView recyclerView;
+
+    @BindView(R.id.activity_search_bandmates_logout_button)
+    Button logoutButton;
 
     private GoogleMap mMap;
 
@@ -74,6 +90,33 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
             bandmates.add(bandmate);
             adapter.notifyDataSetChanged();
         });
+
+        if (viewModel.checkUserSignedIn()){
+            logoutButton.setVisibility(View.VISIBLE);
+        } else {
+            List<AuthUI.IdpConfig> providers = Arrays.asList(
+                    new AuthUI.IdpConfig.EmailBuilder().build());
+
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setLogo(R.drawable.icon_bandmates)
+                            .setTheme(R.style.AppTheme)
+                            .setAvailableProviders(providers)
+                            .build(),
+                    RC_SIGN_IN);
+        }
+    }
+
+    @OnClick(R.id.activity_search_bandmates_logout_button)
+    public void logout(){
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        logoutButton.setVisibility(View.GONE);
+                    }
+                });
     }
 
     @Override
@@ -82,6 +125,23 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         LatLng lugo = new LatLng(44.422150, 11.910800);
         mMap.addMarker(new MarkerOptions().position(lugo).title("Lugo"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lugo,15f));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            if (resultCode == RESULT_OK) {
+                logoutButton.setVisibility(View.VISIBLE);
+            } else {
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                // ...
+            }
+        }
     }
 
     @Override
