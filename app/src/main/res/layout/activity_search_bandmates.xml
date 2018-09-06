@@ -7,7 +7,7 @@
     android:background="@color/backgroundColor">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/activity_main_toolbar"
+        android:id="@+id/activity_search_bandmates_toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -39,29 +39,30 @@
     </android.support.v7.widget.Toolbar>
 
     <fragment
-        android:id="@+id/activity_main_map"
+        android:id="@+id/activity_search_bandmates_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/activity_main_rw"
+        app:layout_constraintBottom_toTopOf="@+id/activity_search_bandmates_rw"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_main_toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/activity_search_bandmates_toolbar"
         tools:context=".app.MapsActivity" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/activity_main_rw"
+        android:id="@+id/activity_search_bandmates_rw"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_main_map" />
+        app:layout_constraintTop_toBottomOf="@+id/activity_search_bandmates_map" />
 
     <Button
-        android:id="@+id/activity_main_login_button"
+        android:visibility="gone"
+        android:id="@+id/activity_search_bandmates_login_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

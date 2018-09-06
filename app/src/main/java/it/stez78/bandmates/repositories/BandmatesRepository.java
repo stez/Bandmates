@@ -35,7 +35,7 @@ public class BandmatesRepository {
                         return;
                     }
                     for (QueryDocumentSnapshot doc : value) {
-                        res.postValue(doc.toObject(Bandmate.class));
+                        res.setValue(doc.toObject(Bandmate.class));
                     }
                 });
         return res;

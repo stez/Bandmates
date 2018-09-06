@@ -1,5 +1,7 @@
 package it.stez78.bandmates.app.activities.searchbandmates;
 
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -36,10 +38,10 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
 
-    @BindView(R.id.activity_main_toolbar)
+    @BindView(R.id.activity_search_bandmates_toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.activity_main_rw)
+    @BindView(R.id.activity_search_bandmates_rw)
     RecyclerView recyclerView;
 
     private GoogleMap mMap;
@@ -48,7 +50,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     private BandmateAdapter adapter;
 
     @Inject
-    BandmatesAppViewModelFactory viewModelFactory;
+    ViewModelProvider.Factory viewModelFactory;
     private SearchBandmatesViewModel viewModel;
 
     private List<Bandmate> bandmates = new ArrayList<>();
@@ -56,9 +58,9 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_search_bandmates);
         ButterKnife.bind(this);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.activity_main_map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.activity_search_bandmates_map);
         mapFragment.getMapAsync(this);
         setSupportActionBar(toolbar);
 
@@ -77,9 +79,9 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng lugo = new LatLng(44.422150, 11.910800);
+        mMap.addMarker(new MarkerOptions().position(lugo).title("Lugo"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lugo,15f));
     }
 
     @Override
