@@ -2,7 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_add"
+        android:id="@+id/menu_profile"
+        android:icon="@drawable/ic_person_secondary_24dp"
+        app:showAsAction="ifRoom"
+        android:title="Profile">
+        <menu xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:id="@+id/menu_profile_popup_settings"
+                android:title="Settings" />
+            <item android:id="@+id/menu_profile_popup_logout"
+                android:title="Logout"/>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/menu_profile_login"
         android:icon="@drawable/ic_person_primary_24dp"
         app:showAsAction="ifRoom"
         android:title="Profile">

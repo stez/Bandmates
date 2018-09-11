@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -91,39 +92,51 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
             bandmates.add(bandmate);
             adapter.notifyDataSetChanged();
         });
-
-        if (viewModel.checkUserSignedIn()){
-            logoutButton.setVisibility(View.VISIBLE);
-        } else {
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
-                    new AuthUI.IdpConfig.EmailBuilder().build());
-
-            startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setLogo(R.drawable.icon_bandmates)
-                            .setTheme(R.style.AppTheme)
-                            .setAvailableProviders(providers)
-                            .build(),
-                    RC_SIGN_IN);
-        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        if (viewModel.checkUserSignedIn()){
+            toolbarForAuthenticatedUser();
+        } else {
+            toolbarForVisitors();
+        }
         return true;
     }
 
-    @OnClick(R.id.activity_search_bandmates_logout_button)
+    private void toolbarForAuthenticatedUser(){
+        toolbar.getMenu().findItem(R.id.menu_profile_login).setVisible(false);
+        toolbar.getMenu().findItem(R.id.menu_profile).setVisible(true);
+    }
+
+    private void toolbarForVisitors(){
+        toolbar.getMenu().findItem(R.id.menu_profile_login).setVisible(true);
+        toolbar.getMenu().findItem(R.id.menu_profile).setVisible(false);
+    }
+
     public void logout(){
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
-                        logoutButton.setVisibility(View.GONE);
+                        toolbarForVisitors();
                     }
                 });
+    }
+
+    public void login(){
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build());
+
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setLogo(R.drawable.icon_bandmates)
+                        .setTheme(R.style.AppTheme)
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
     }
 
     @Override
@@ -135,18 +148,28 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_profile_popup_logout:
+                logout();
+                return true;
+            case R.id.menu_profile_login:
+                login();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                logoutButton.setVisibility(View.VISIBLE);
+                toolbarForAuthenticatedUser();
             } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
+
             }
         }
     }
