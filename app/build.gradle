@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "it.stez78.bandmates"
         minSdkVersion 21
@@ -43,6 +44,7 @@ dependencies {
 
     // MAPS
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'com.google.android.gms:play-services-places:15.0.1'
 
     // STETHO
     implementation 'com.facebook.stetho:stetho:1.5.0'
