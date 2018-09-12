@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,12 @@ import android.widget.Button;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -67,6 +74,9 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     Button logoutButton;
 
     private GoogleMap mMap;
+    private GeoDataClient geoDataClient;
+    private PlaceDetectionClient placeDetectionClient;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     private RecyclerView.LayoutManager layoutManager;
     private BandmateAdapter adapter;
@@ -100,9 +110,21 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
             }
         });
-
         setSupportActionBar(toolbar);
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationProviderClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            LatLng newCameraPosition = new LatLng(location.getLatitude(),location.getLongitude());
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 10f));
+
+                        }
+                    }
+                });
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -113,6 +135,10 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         viewModel.bandmatesLiveData().observe(this, bandmate -> {
             bandmates.add(bandmate);
             adapter.notifyDataSetChanged();
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
+                    .title(bandmate.getName())
+                    .snippet(bandmate.getInstrument()));
         });
     }
 
@@ -164,9 +190,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng lugo = new LatLng(44.422150, 11.910800);
-        mMap.addMarker(new MarkerOptions().position(lugo).title("Lugo"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lugo,15f));
     }
 
     @Override

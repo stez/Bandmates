@@ -1,5 +1,7 @@
 package it.stez78.bandmates.model;
 
+import com.google.firebase.firestore.GeoPoint;
+
 import lombok.Data;
 
 /**
@@ -13,4 +15,5 @@ public class Bandmate {
     private String instrument;
     private String location;
     private Boolean publicProfile;
+    private GeoPoint latlon;
 }
