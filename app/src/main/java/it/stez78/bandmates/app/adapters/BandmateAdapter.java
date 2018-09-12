@@ -1,5 +1,6 @@
 package it.stez78.bandmates.app.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,9 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import it.stez78.bandmates.R;
+import it.stez78.bandmates.di.GlideApp;
 import it.stez78.bandmates.model.Bandmate;
 
 /**
@@ -17,6 +23,7 @@ import it.stez78.bandmates.model.Bandmate;
  */
 public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHolder> {
 
+    private Context ctx;
     private List<Bandmate> bandmates;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -25,10 +32,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         private TextView age;
         private TextView location;
         private TextView instrument;
-        private ImageView bgGuitar;
-        private ImageView bgDrums;
-        private ImageView bgBass;
-        private ImageView bgVocals;
+        private ImageView bg;
 
         public ViewHolder(View rootView) {
             super(rootView);
@@ -36,10 +40,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
             age = rootView.findViewById(R.id.list_element_bandmate_age);
             location = rootView.findViewById(R.id.list_element_bandmate_location);
             instrument = rootView.findViewById(R.id.list_element_bandmate_instrument);
-            bgGuitar = rootView.findViewById(R.id.list_element_bandmate_bg_guitar);
-            bgDrums = rootView.findViewById(R.id.list_element_bandmate_bg_drums);
-            bgBass = rootView.findViewById(R.id.list_element_bandmate_bg_bass);
-            bgVocals = rootView.findViewById(R.id.list_element_bandmate_bg_vocals);
+            bg = rootView.findViewById(R.id.list_element_bandmate_bg);
         }
 
         public TextView getName() {
@@ -58,16 +59,11 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
             return instrument;
         }
 
-        public ImageView getBgGuitar() { return bgGuitar; }
-
-        public ImageView getBgDrums() { return bgDrums; }
-
-        public ImageView getBgBass() { return bgBass; }
-
-        public ImageView getBgVocals() { return bgVocals; }
+        public ImageView getBg() { return bg; }
     }
 
-    public BandmateAdapter(List<Bandmate> bandmates) {
+    public BandmateAdapter(Context ctx, List<Bandmate> bandmates) {
+        this.ctx = ctx;
         this.bandmates = bandmates;
     }
 
@@ -85,36 +81,24 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         holder.getAge().setText(bandmate.getAge().toString()+" years old");
         holder.getInstrument().setText(bandmate.getInstrument());
         holder.getLocation().setText(bandmate.getLocation());
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageRef = firebaseStorage.getReference().child("background_guitar_1.jpg");
+
+        Picasso p = Picasso.get();
         switch (bandmate.getInstrument()){
             case "guitar":
-                holder.getBgGuitar().setVisibility(View.VISIBLE);
-                holder.getBgDrums().setVisibility(View.INVISIBLE);
-                holder.getBgBass().setVisibility(View.INVISIBLE);
-                holder.getBgVocals().setVisibility(View.INVISIBLE);
+                GlideApp.with(ctx)
+                        .load(storageRef)
+                        .into(holder.getBg());
                 break;
             case "drums":
-                holder.getBgGuitar().setVisibility(View.INVISIBLE);
-                holder.getBgDrums().setVisibility(View.VISIBLE);
-                holder.getBgBass().setVisibility(View.INVISIBLE);
-                holder.getBgVocals().setVisibility(View.INVISIBLE);
+                p.load(R.drawable.background_drums_1).into(holder.getBg());
                 break;
             case "bass":
-                holder.getBgGuitar().setVisibility(View.INVISIBLE);
-                holder.getBgDrums().setVisibility(View.INVISIBLE);
-                holder.getBgBass().setVisibility(View.VISIBLE);
-                holder.getBgVocals().setVisibility(View.INVISIBLE);
-                break;
-            case "vocals":
-                holder.getBgGuitar().setVisibility(View.INVISIBLE);
-                holder.getBgDrums().setVisibility(View.INVISIBLE);
-                holder.getBgBass().setVisibility(View.INVISIBLE);
-                holder.getBgVocals().setVisibility(View.VISIBLE);
+                p.load(R.drawable.background_bass_1).into(holder.getBg());
                 break;
             default:
-                holder.getBgGuitar().setVisibility(View.INVISIBLE);
-                holder.getBgDrums().setVisibility(View.INVISIBLE);
-                holder.getBgBass().setVisibility(View.INVISIBLE);
-                holder.getBgVocals().setVisibility(View.VISIBLE);
+                p.load(R.drawable.background_vocal_1).into(holder.getBg());
         }
     }
 

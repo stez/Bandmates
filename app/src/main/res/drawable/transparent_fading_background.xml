@@ -7,6 +7,5 @@
         android:endColor="#FFF"
         android:angle="135"
         android:type="linear"
-        android:useLevel="true"
-        />
+        android:useLevel="true" />
 </shape>

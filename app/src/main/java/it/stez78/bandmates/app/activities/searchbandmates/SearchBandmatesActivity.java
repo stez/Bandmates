@@ -116,7 +116,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BandmateAdapter(bandmates);
+        adapter = new BandmateAdapter(this, bandmates);
         recyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);

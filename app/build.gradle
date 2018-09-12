@@ -40,7 +40,9 @@ dependencies {
     // FIRABASE
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-firestore:17.1.0'
+    implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    implementation 'com.firebaseui:firebase-ui-storage:4.1.0'
 
     // MAPS PLACES AND LOCATION
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
@@ -65,9 +67,13 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // PICASSO
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+
+    // GLIDE
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
 
     // LOMBOK
     compileOnly 'org.projectlombok:lombok:1.16.20'
