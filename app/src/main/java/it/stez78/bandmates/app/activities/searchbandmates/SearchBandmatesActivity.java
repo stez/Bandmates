@@ -1,6 +1,5 @@
 package it.stez78.bandmates.app.activities.searchbandmates;
 
-import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -14,18 +13,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceDetectionClient;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,8 +31,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +40,8 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
-import it.stez78.bandmates.BandmatesAppViewModelFactory;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
 import it.stez78.bandmates.model.Bandmate;
@@ -73,9 +63,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @BindView(R.id.activity_search_bandmates_logout_button)
     Button logoutButton;
 
-    private GoogleMap mMap;
-    private GeoDataClient geoDataClient;
-    private PlaceDetectionClient placeDetectionClient;
+    private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private RecyclerView.LayoutManager layoutManager;
@@ -99,10 +87,10 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 12.0f));
+                googleMap.clear();
+                googleMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 12.0f));
             }
 
             @Override
@@ -119,8 +107,8 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                     public void onSuccess(Location location) {
                         if (location != null) {
                             LatLng newCameraPosition = new LatLng(location.getLatitude(),location.getLongitude());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 10f));
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 10f));
 
                         }
                     }
@@ -135,7 +123,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         viewModel.bandmatesLiveData().observe(this, bandmate -> {
             bandmates.add(bandmate);
             adapter.notifyDataSetChanged();
-            mMap.addMarker(new MarkerOptions()
+            googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
                     .title(bandmate.getName())
                     .snippet(bandmate.getInstrument()));
@@ -189,7 +177,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        this.googleMap = googleMap;
     }
 
     @Override

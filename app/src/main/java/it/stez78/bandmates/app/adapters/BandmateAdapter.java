@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -24,6 +25,10 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         private TextView age;
         private TextView location;
         private TextView instrument;
+        private ImageView bgGuitar;
+        private ImageView bgDrums;
+        private ImageView bgBass;
+        private ImageView bgVocals;
 
         public ViewHolder(View rootView) {
             super(rootView);
@@ -31,6 +36,10 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
             age = rootView.findViewById(R.id.list_element_bandmate_age);
             location = rootView.findViewById(R.id.list_element_bandmate_location);
             instrument = rootView.findViewById(R.id.list_element_bandmate_instrument);
+            bgGuitar = rootView.findViewById(R.id.list_element_bandmate_bg_guitar);
+            bgDrums = rootView.findViewById(R.id.list_element_bandmate_bg_drums);
+            bgBass = rootView.findViewById(R.id.list_element_bandmate_bg_bass);
+            bgVocals = rootView.findViewById(R.id.list_element_bandmate_bg_vocals);
         }
 
         public TextView getName() {
@@ -48,6 +57,14 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         public TextView getInstrument() {
             return instrument;
         }
+
+        public ImageView getBgGuitar() { return bgGuitar; }
+
+        public ImageView getBgDrums() { return bgDrums; }
+
+        public ImageView getBgBass() { return bgBass; }
+
+        public ImageView getBgVocals() { return bgVocals; }
     }
 
     public BandmateAdapter(List<Bandmate> bandmates) {
@@ -65,9 +82,40 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         Bandmate bandmate = bandmates.get(position);
         holder.getName().setText(bandmate.getName());
-        holder.getAge().setText(bandmate.getAge().toString());
+        holder.getAge().setText(bandmate.getAge().toString()+" years old");
         holder.getInstrument().setText(bandmate.getInstrument());
         holder.getLocation().setText(bandmate.getLocation());
+        switch (bandmate.getInstrument()){
+            case "guitar":
+                holder.getBgGuitar().setVisibility(View.VISIBLE);
+                holder.getBgDrums().setVisibility(View.INVISIBLE);
+                holder.getBgBass().setVisibility(View.INVISIBLE);
+                holder.getBgVocals().setVisibility(View.INVISIBLE);
+                break;
+            case "drums":
+                holder.getBgGuitar().setVisibility(View.INVISIBLE);
+                holder.getBgDrums().setVisibility(View.VISIBLE);
+                holder.getBgBass().setVisibility(View.INVISIBLE);
+                holder.getBgVocals().setVisibility(View.INVISIBLE);
+                break;
+            case "bass":
+                holder.getBgGuitar().setVisibility(View.INVISIBLE);
+                holder.getBgDrums().setVisibility(View.INVISIBLE);
+                holder.getBgBass().setVisibility(View.VISIBLE);
+                holder.getBgVocals().setVisibility(View.INVISIBLE);
+                break;
+            case "vocals":
+                holder.getBgGuitar().setVisibility(View.INVISIBLE);
+                holder.getBgDrums().setVisibility(View.INVISIBLE);
+                holder.getBgBass().setVisibility(View.INVISIBLE);
+                holder.getBgVocals().setVisibility(View.VISIBLE);
+                break;
+            default:
+                holder.getBgGuitar().setVisibility(View.INVISIBLE);
+                holder.getBgDrums().setVisibility(View.INVISIBLE);
+                holder.getBgBass().setVisibility(View.INVISIBLE);
+                holder.getBgVocals().setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
