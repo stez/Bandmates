@@ -17,6 +17,7 @@ import java.util.List;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.di.GlideApp;
 import it.stez78.bandmates.model.Bandmate;
+import timber.log.Timber;
 
 /**
  * Created by Stefano Zanotti on 03/09/2018.
@@ -82,24 +83,24 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         holder.getInstrument().setText(bandmate.getInstrument());
         holder.getLocation().setText(bandmate.getLocation());
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        StorageReference storageRef = firebaseStorage.getReference().child("background_guitar_1.jpg");
+        StorageReference storageRef = firebaseStorage.getReference().child("backgrounds");
 
-        Picasso p = Picasso.get();
         switch (bandmate.getInstrument()){
             case "guitar":
-                GlideApp.with(ctx)
-                        .load(storageRef)
-                        .into(holder.getBg());
+                storageRef = storageRef.child("guitar/1.jpg");
                 break;
             case "drums":
-                p.load(R.drawable.background_drums_1).into(holder.getBg());
+                storageRef = storageRef.child("drum/1.jpg");
                 break;
             case "bass":
-                p.load(R.drawable.background_bass_1).into(holder.getBg());
+                storageRef = storageRef.child("bass/1.jpg");
                 break;
             default:
-                p.load(R.drawable.background_vocal_1).into(holder.getBg());
+                storageRef = storageRef.child("vocals/1.jpg");
         }
+        GlideApp.with(ctx)
+                .load(storageRef)
+                .into(holder.getBg());
     }
 
     @Override

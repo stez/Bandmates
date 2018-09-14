@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
@@ -28,9 +29,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+
+import org.imperiumlabs.geofirestore.GeoFirestore;
+import org.imperiumlabs.geofirestore.GeoQuery;
+import org.imperiumlabs.geofirestore.GeoQueryDataEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +54,7 @@ import dagger.android.support.HasSupportFragmentInjector;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
 import it.stez78.bandmates.model.Bandmate;
+import it.stez78.bandmates.repositories.BandmatesRepository;
 
 public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
 
@@ -65,6 +75,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private GeoFirestore geoFirestore;
 
     private RecyclerView.LayoutManager layoutManager;
     private BandmateAdapter adapter;
@@ -109,7 +120,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                             LatLng newCameraPosition = new LatLng(location.getLatitude(),location.getLongitude());
                             googleMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
                             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 10f));
-
                         }
                     }
                 });
@@ -119,14 +129,16 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         adapter = new BandmateAdapter(this, bandmates);
         recyclerView.setAdapter(adapter);
 
+        geoFirestore = new GeoFirestore(FirebaseFirestore.getInstance().collection(BandmatesRepository.FIRESTORE_BANDMATES_COLLECTION_NAME));
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);
         viewModel.bandmatesLiveData().observe(this, bandmate -> {
             bandmates.add(bandmate);
-            adapter.notifyDataSetChanged();
+            //geoFirestore.setLocation(bandmate.getId(),bandmate.getLatlon());
+            /*adapter.notifyDataSetChanged();
             googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
                     .title(bandmate.getName())
-                    .snippet(bandmate.getInstrument()));
+                    .snippet(bandmate.getInstrument()));*/
         });
     }
 
@@ -178,6 +190,87 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
+
+                LatLng farRight = visibleRegion.farRight;
+                LatLng farLeft = visibleRegion.farLeft;
+                LatLng nearRight = visibleRegion.nearRight;
+                LatLng nearLeft = visibleRegion.nearLeft;
+
+                float[] distanceWidth = new float[2];
+                Location.distanceBetween(
+                        (farRight.latitude+nearRight.latitude)/2,
+                        (farRight.longitude+nearRight.longitude)/2,
+                        (farLeft.latitude+nearLeft.latitude)/2,
+                        (farLeft.longitude+nearLeft.longitude)/2,
+                        distanceWidth
+                );
+
+
+                float[] distanceHeight = new float[2];
+                Location.distanceBetween(
+                        (farRight.latitude+nearRight.latitude)/2,
+                        (farRight.longitude+nearRight.longitude)/2,
+                        (farLeft.latitude+nearLeft.latitude)/2,
+                        (farLeft.longitude+nearLeft.longitude)/2,
+                        distanceHeight
+                );
+
+                float distance;
+
+                if (distanceWidth[0]>distanceHeight[0]){
+                    distance = distanceWidth[0];
+                } else {
+                    distance = distanceHeight[0];
+                }
+
+                LatLng center = googleMap.getCameraPosition().target;
+
+                Toast.makeText(getApplicationContext(),"CENTRO CAMERA: "+center.toString()+" RAGGIO CAMERA: "+distance/1000,Toast.LENGTH_LONG).show();
+                bandmates.clear();
+                adapter.notifyDataSetChanged();
+                GeoQuery geoQuery = geoFirestore.queryAtLocation(new GeoPoint(center.latitude,center.longitude),distance/1000);
+                geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                    @Override
+                    public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
+                        Bandmate bandmate =documentSnapshot.toObject(Bandmate.class);
+                        bandmates.add(bandmate);
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
+                                .title(bandmate.getName())
+                                .snippet(bandmate.getInstrument()));
+                    }
+
+                    @Override
+                    public void onDocumentExited(DocumentSnapshot documentSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
+
+                    }
+
+                    @Override
+                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
+
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onGeoQueryError(Exception e) {
+
+                    }
+                });
+            }
+        });
     }
 
     @Override

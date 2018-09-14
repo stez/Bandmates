@@ -15,7 +15,7 @@ import timber.log.Timber;
 @Singleton
 public class BandmatesRepository {
 
-    private final static String FIRESTORE_BANDMATES_COLLECTION_NAME = "bandmates";
+    public final static String FIRESTORE_BANDMATES_COLLECTION_NAME = "bandmates";
     private final static String PUBLIC_PROFILE_FIELD = "publicProfile";
 
     private FirebaseFirestore db;
@@ -35,7 +35,9 @@ public class BandmatesRepository {
                         return;
                     }
                     for (QueryDocumentSnapshot doc : value) {
-                        res.setValue(doc.toObject(Bandmate.class));
+                        Bandmate bandmate = doc.toObject(Bandmate.class);
+                        bandmate.setId(doc.getId());
+                        res.setValue(bandmate);
                     }
                 });
         return res;

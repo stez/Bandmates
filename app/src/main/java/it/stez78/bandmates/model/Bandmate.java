@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class Bandmate {
 
+    private String id;
     private String name;
     private Long age;
     private String instrument;
