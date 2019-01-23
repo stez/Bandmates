@@ -16,5 +16,5 @@ public class Bandmate {
     private String instrument;
     private String location;
     private Boolean publicProfile;
-    private GeoPoint latlon;
+    //private GeoPoint latlon;
 }

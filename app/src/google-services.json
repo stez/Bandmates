@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "1055080529664",
+    "firebase_url": "https://bandmates-1d261.firebaseio.com",
+    "project_id": "bandmates-1d261",
+    "storage_bucket": "bandmates-1d261.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1055080529664:android:09d2b404959582f9",
+        "android_client_info": {
+          "package_name": "it.stez78.bandmates"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1055080529664-hi2611ss52n6r26k2hinfhfdm731ifsd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.stez78.bandmates",
+            "certificate_hash": "2bfb8a8209210a980474ebe822b65855e58ef5d9"
+          }
+        },
+        {
+          "client_id": "1055080529664-1srtsl96d2b0bjqgv7qelgrqn7t7h6cb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.stez78.bandmates",
+            "certificate_hash": "2816d50a390ec55c9d8e0865b152fba1555dfd8d"
+          }
+        },
+        {
+          "client_id": "1055080529664-ki8b5egbpojlmj209fce23kvh87a63n5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCb8GTc-KZ36kCekg2hzNcM7o-q_FWNno"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1055080529664-ki8b5egbpojlmj209fce23kvh87a63n5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

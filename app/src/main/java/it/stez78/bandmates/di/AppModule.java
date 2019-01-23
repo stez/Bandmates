@@ -3,6 +3,7 @@ package it.stez78.bandmates.di;
 import android.app.Application;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
@@ -36,9 +37,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    FirebaseFirestore provideFirestore() {
-        return FirebaseFirestore.getInstance();
-    }
+    FirebaseDatabase  provideDatabase() { return FirebaseDatabase.getInstance(); }
 
     @Provides
     @Singleton

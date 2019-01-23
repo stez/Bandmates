@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -75,7 +76,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private GeoFirestore geoFirestore;
 
     private RecyclerView.LayoutManager layoutManager;
     private BandmateAdapter adapter;
@@ -83,6 +83,9 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     private SearchBandmatesViewModel viewModel;
+
+    @Inject
+    FirebaseDatabase firebaseDatabase;
 
     private List<Bandmate> bandmates = new ArrayList<>();
 
@@ -129,7 +132,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         adapter = new BandmateAdapter(this, bandmates);
         recyclerView.setAdapter(adapter);
 
-        geoFirestore = new GeoFirestore(FirebaseFirestore.getInstance().collection(BandmatesRepository.FIRESTORE_BANDMATES_COLLECTION_NAME));
+        //geoFirestore = new GeoFirestore(FirebaseFirestore.getInstance().collection(BandmatesRepository.FIRESTORE_BANDMATES_COLLECTION_NAME));
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);
         viewModel.bandmatesLiveData().observe(this, bandmate -> {
             bandmates.add(bandmate);
@@ -232,7 +235,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                 Toast.makeText(getApplicationContext(),"CENTRO CAMERA: "+center.toString()+" RAGGIO CAMERA: "+distance/1000,Toast.LENGTH_LONG).show();
                 bandmates.clear();
                 adapter.notifyDataSetChanged();
-                GeoQuery geoQuery = geoFirestore.queryAtLocation(new GeoPoint(center.latitude,center.longitude),distance/1000);
+                /*GeoQuery geoQuery = geoFirestore.queryAtLocation(new GeoPoint(center.latitude,center.longitude),distance/1000);
                 geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
                     @Override
                     public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
@@ -268,7 +271,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                     public void onGeoQueryError(Exception e) {
 
                     }
-                });
+                });*/
             }
         });
     }
