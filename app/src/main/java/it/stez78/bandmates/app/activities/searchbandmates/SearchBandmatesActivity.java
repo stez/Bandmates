@@ -16,6 +16,10 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,16 +37,10 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 
-import org.imperiumlabs.geofirestore.GeoFirestore;
-import org.imperiumlabs.geofirestore.GeoQuery;
-import org.imperiumlabs.geofirestore.GeoQueryDataEventListener;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,8 +52,6 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
-import it.stez78.bandmates.model.Bandmate;
-import it.stez78.bandmates.repositories.BandmatesRepository;
 import timber.log.Timber;
 
 public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
@@ -142,6 +138,58 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                     .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
                     .title(bandmate.getName())
                     .snippet(bandmate.getInstrument()));*/
+        });
+
+        GeoFire geoFire = new GeoFire(firebaseDatabase.getReference("bandmates"));
+//        geoFire.getLocation("059b318a-612d-4f1c-9895-09e63c0c4d9f", new LocationCallback() {
+//            @Override
+//            public void onLocationResult(String key, GeoLocation location) {
+//                if (location != null) {
+//                    System.out.println(String.format("The location for key %s is [%f,%f]", key, location.latitude, location.longitude));
+//                } else {
+//                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                System.err.println("There was an error getting the GeoFire location: " + databaseError);
+//            }
+//        });
+
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(44.35916, 11.7132), 100);
+        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+
+            @Override
+            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
+                Timber.d("DATA ENTERED " + dataSnapshot.getValue().toString());
+            }
+
+            @Override
+            public void onDataExited(DataSnapshot dataSnapshot) {
+                Timber.d("DATA EXITED " + dataSnapshot.getValue().toString());
+            }
+
+            @Override
+            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
+                Timber.d("DATA MOVED " + dataSnapshot.getValue().toString());
+            }
+
+            @Override
+            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
+                Timber.d("DATA CHANGED " + dataSnapshot.getValue().toString());
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                // ...
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+                // ...
+            }
+
         });
     }
 

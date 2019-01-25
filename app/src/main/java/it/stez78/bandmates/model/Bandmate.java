@@ -1,7 +1,5 @@
 package it.stez78.bandmates.model;
 
-import com.google.firebase.firestore.GeoPoint;
-
 import lombok.Data;
 
 /**

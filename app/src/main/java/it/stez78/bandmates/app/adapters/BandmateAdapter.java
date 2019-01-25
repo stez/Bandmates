@@ -10,14 +10,12 @@ import android.widget.TextView;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.di.GlideApp;
 import it.stez78.bandmates.model.Bandmate;
-import timber.log.Timber;
 
 /**
  * Created by Stefano Zanotti on 03/09/2018.
