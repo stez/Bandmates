@@ -2,21 +2,19 @@ package it.stez78.bandmates.repositories;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import it.stez78.bandmates.di.AppExecutors;
 import it.stez78.bandmates.model.Bandmate;
-import timber.log.Timber;
 
 @Singleton
 public class BandmatesRepository {
@@ -27,30 +25,27 @@ public class BandmatesRepository {
     private FirebaseDatabase db;
     private DatabaseReference bandmateDbRef;
     private final FirebaseQueryLiveData liveData;
+    private final AppExecutors appExecutors;
 
     @Inject
-    public BandmatesRepository(FirebaseDatabase db) {
+    public BandmatesRepository(FirebaseDatabase db, AppExecutors appExecutors) {
         this.db = db;
+        this.appExecutors = appExecutors;
         bandmateDbRef = db.getReference(DATABASE_BANDMATES_COLLECTION_NAME);
         liveData = new FirebaseQueryLiveData(bandmateDbRef);
     }
 
-    public LiveData<Bandmate> updatedPublicProfilesLivedata() {
-        MediatorLiveData<Bandmate> res = new MediatorLiveData<>();
-        res.addSource(liveData, new Observer<DataSnapshot>() {
-            @Override
-            public void onChanged(@Nullable DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            res.postValue(dataSnapshot.getValue(Bandmate.class));
-                        }
-                    }).start();
-                } else {
-                    res.setValue(null);
+    public LiveData<List<Bandmate>> updatedPublicProfilesListLivedata() {
+        MediatorLiveData<List<Bandmate>> res = new MediatorLiveData<>();
+        res.addSource(liveData, dataSnapshot -> {
+            appExecutors.networkIO().execute(() -> {
+                List<Bandmate> bandmates = new ArrayList<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Bandmate bandmate = ds.getValue(Bandmate.class);
+                    bandmates.add(bandmate);
                 }
-            }
+                res.postValue(bandmates);
+            });
         });
         return res;
     }

@@ -56,6 +56,7 @@ import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
 import it.stez78.bandmates.model.Bandmate;
 import it.stez78.bandmates.repositories.BandmatesRepository;
+import timber.log.Timber;
 
 public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
 
@@ -87,13 +88,13 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Inject
     FirebaseDatabase firebaseDatabase;
 
-    private List<Bandmate> bandmates = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_bandmates);
         ButterKnife.bind(this);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.activity_search_bandmates_map);
         mapFragment.getMapAsync(this);
 
@@ -129,13 +130,12 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BandmateAdapter(this, bandmates);
+        adapter = new BandmateAdapter(this, viewModel.getBandmates());
         recyclerView.setAdapter(adapter);
-
-        //geoFirestore = new GeoFirestore(FirebaseFirestore.getInstance().collection(BandmatesRepository.FIRESTORE_BANDMATES_COLLECTION_NAME));
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);
-        viewModel.bandmatesLiveData().observe(this, bandmate -> {
-            bandmates.add(bandmate);
+        viewModel.bandmatesLiveData().observe(this, bandmatesList -> {
+            Timber.d("RECEIVED BANDMATES LIST: "+bandmatesList);
+            viewModel.setBandmates(bandmatesList);
+            adapter.notifyDataSetChanged();
             //geoFirestore.setLocation(bandmate.getId(),bandmate.getLatlon());
             /*adapter.notifyDataSetChanged();
             googleMap.addMarker(new MarkerOptions()
@@ -233,9 +233,10 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                 LatLng center = googleMap.getCameraPosition().target;
 
                 Toast.makeText(getApplicationContext(),"CENTRO CAMERA: "+center.toString()+" RAGGIO CAMERA: "+distance/1000,Toast.LENGTH_LONG).show();
+                /*
                 bandmates.clear();
                 adapter.notifyDataSetChanged();
-                /*GeoQuery geoQuery = geoFirestore.queryAtLocation(new GeoPoint(center.latitude,center.longitude),distance/1000);
+                GeoQuery geoQuery = geoFirestore.queryAtLocation(new GeoPoint(center.latitude,center.longitude),distance/1000);
                 geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
                     @Override
                     public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
@@ -293,12 +294,11 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 toolbarForAuthenticatedUser();
             } else {
-
+                toolbarForVisitors();
             }
         }
     }
