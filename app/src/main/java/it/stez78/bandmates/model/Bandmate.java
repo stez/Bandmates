@@ -10,9 +10,10 @@ public class Bandmate {
 
     private String id;
     private String name;
-    private Long age;
+    private int age;
     private String instrument;
     private String location;
     private Boolean publicProfile;
-    //private GeoPoint latlon;
+    private double lat;
+    private double lon;
 }

@@ -20,6 +20,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryDataEventListener;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,12 +38,14 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -52,6 +55,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
+import it.stez78.bandmates.model.Bandmate;
 import timber.log.Timber;
 
 public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
@@ -83,6 +87,9 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
     @Inject
     FirebaseDatabase firebaseDatabase;
+
+    @Inject
+    GeoFire geoFire;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,68 +135,39 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         recyclerView.setLayoutManager(layoutManager);
         adapter = new BandmateAdapter(this, viewModel.getBandmates());
         recyclerView.setAdapter(adapter);
+
         viewModel.bandmatesLiveData().observe(this, bandmatesList -> {
             Timber.d("RECEIVED BANDMATES LIST: "+bandmatesList);
             viewModel.setBandmates(bandmatesList);
             adapter.notifyDataSetChanged();
-            //geoFirestore.setLocation(bandmate.getId(),bandmate.getLatlon());
-            /*adapter.notifyDataSetChanged();
-            googleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
-                    .title(bandmate.getName())
-                    .snippet(bandmate.getInstrument()));*/
         });
 
-        GeoFire geoFire = new GeoFire(firebaseDatabase.getReference("bandmates"));
-//        geoFire.getLocation("059b318a-612d-4f1c-9895-09e63c0c4d9f", new LocationCallback() {
-//            @Override
-//            public void onLocationResult(String key, GeoLocation location) {
-//                if (location != null) {
-//                    System.out.println(String.format("The location for key %s is [%f,%f]", key, location.latitude, location.longitude));
-//                } else {
-//                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                System.err.println("There was an error getting the GeoFire location: " + databaseError);
-//            }
-//        });
-
         GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(44.35916, 11.7132), 100);
-        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
-            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-                Timber.d("DATA ENTERED " + dataSnapshot.getValue().toString());
+            public void onKeyEntered(String key, GeoLocation location) {
+
             }
 
             @Override
-            public void onDataExited(DataSnapshot dataSnapshot) {
-                Timber.d("DATA EXITED " + dataSnapshot.getValue().toString());
+            public void onKeyExited(String key) {
+
             }
 
             @Override
-            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
-                Timber.d("DATA MOVED " + dataSnapshot.getValue().toString());
-            }
+            public void onKeyMoved(String key, GeoLocation location) {
 
-            @Override
-            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
-                Timber.d("DATA CHANGED " + dataSnapshot.getValue().toString());
             }
 
             @Override
             public void onGeoQueryReady() {
-                // ...
+
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                // ...
-            }
 
+            }
         });
     }
 
@@ -333,6 +311,12 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                 return true;
             case R.id.menu_profile_login:
                 login();
+                return true;
+            case R.id.menu_profile_populatedata:
+                Random random = new Random();
+                int howMany = random.nextInt(100)+1;
+                viewModel.generateBandmates(howMany);
+                Toast.makeText(this,"Generating "+howMany+" new Bandmates!",Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

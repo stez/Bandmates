@@ -2,6 +2,7 @@ package it.stez78.bandmates.di;
 
 import android.app.Application;
 
+import com.firebase.geofire.GeoFire;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jakewharton.picasso.OkHttp3Downloader;
@@ -11,6 +12,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import it.stez78.bandmates.AppConfig;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -36,7 +38,13 @@ class AppModule {
 
     @Provides
     @Singleton
-    FirebaseDatabase  provideDatabase() { return FirebaseDatabase.getInstance(); }
+    FirebaseDatabase provideDatabase() { return FirebaseDatabase.getInstance(); }
+
+    @Provides
+    @Singleton
+    GeoFire provideGeoFire(FirebaseDatabase firebaseDatabase) {
+        return new GeoFire(firebaseDatabase.getReference(AppConfig.FIREBASE_DATABASE_GEOFIRE_DB_REF));
+    }
 
     @Provides
     @Singleton

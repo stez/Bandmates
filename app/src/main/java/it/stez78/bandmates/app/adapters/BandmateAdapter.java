@@ -77,7 +77,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         Bandmate bandmate = bandmates.get(position);
         holder.getName().setText(bandmate.getName());
-        holder.getAge().setText(bandmate.getAge().toString()+" years old");
+        holder.getAge().setText(bandmate.getAge()+" years old");
         holder.getInstrument().setText(bandmate.getInstrument());
         holder.getLocation().setText(bandmate.getLocation());
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
