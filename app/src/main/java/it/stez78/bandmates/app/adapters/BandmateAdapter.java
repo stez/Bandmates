@@ -83,7 +83,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference storageRef = firebaseStorage.getReference().child("backgrounds");
 
-        switch (bandmate.getInstrument()){
+        /*switch (bandmate.getInstrument()){
             case "guitar":
                 storageRef = storageRef.child("guitar/1.jpg");
                 break;
@@ -98,7 +98,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         }
         GlideApp.with(ctx)
                 .load(storageRef)
-                .into(holder.getBg());
+                .into(holder.getBg());*/
     }
 
     @Override

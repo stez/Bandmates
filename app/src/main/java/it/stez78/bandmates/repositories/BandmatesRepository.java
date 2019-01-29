@@ -10,6 +10,7 @@ import com.github.javafaker.Faker;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,19 @@ public class BandmatesRepository {
                     bandmates.add(bandmate);
                 }
                 res.postValue(bandmates);
+            });
+        });
+        return res;
+    }
+
+    public LiveData<Bandmate> getSingleBandmate(String childId){
+        Query getSingle = bandmateDbRef.orderByKey().equalTo(childId);
+        MediatorLiveData<Bandmate> res = new MediatorLiveData<>();
+        res.addSource(new FirebaseQueryLiveData(getSingle), dataSnapshot -> {
+            Timber.d("SINGLE SNAPSHOT RECEIVED: "+dataSnapshot);
+            appExecutors.networkIO().execute(() -> {
+                Bandmate bandmate = dataSnapshot.getValue(Bandmate.class);
+                res.postValue(bandmate);
             });
         });
         return res;
