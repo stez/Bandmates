@@ -2,16 +2,24 @@ package it.stez78.bandmates.repositories;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
+import android.support.annotation.NonNull;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.github.javafaker.Address;
+import com.github.javafaker.ChuckNorris;
 import com.github.javafaker.Faker;
+import com.github.javafaker.Internet;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +37,8 @@ import timber.log.Timber;
 
 @Singleton
 public class BandmatesRepository {
+
+    private static final char decimalSeparator = new DecimalFormatSymbols().getDecimalSeparator();
 
     private FirebaseDatabase db;
     private GeoFire geoFire;
@@ -63,14 +73,18 @@ public class BandmatesRepository {
     }
 
     public LiveData<Bandmate> getSingleBandmate(String childId){
-        Query getSingle = bandmateDbRef.orderByKey().equalTo(childId);
-        MediatorLiveData<Bandmate> res = new MediatorLiveData<>();
-        res.addSource(new FirebaseQueryLiveData(getSingle), dataSnapshot -> {
-            Timber.d("SINGLE SNAPSHOT RECEIVED: "+dataSnapshot);
-            appExecutors.networkIO().execute(() -> {
-                Bandmate bandmate = dataSnapshot.getValue(Bandmate.class);
-                res.postValue(bandmate);
-            });
+        DatabaseReference getSingle = bandmateDbRef.child(childId);
+        MutableLiveData<Bandmate> res = new MutableLiveData<>();
+        getSingle.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                res.postValue(dataSnapshot.getValue(Bandmate.class));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
         });
         return res;
     }
@@ -86,9 +100,14 @@ public class BandmatesRepository {
             b.setInstrument(instruments[new Random().nextInt(5)]);
             b.setPublicProfile(true);
             Address address = faker.address();
-            b.setLat(Double.valueOf(address.latitude()));
-            b.setLon(Double.valueOf(address.longitude()));
+            b.setLat(Double.valueOf(address.latitude().replace(decimalSeparator, '.')));
+            b.setLon(Double.valueOf(address.longitude().replace(decimalSeparator, '.')));
             b.setLocation(address.cityName());
+            Internet internet = faker.internet();
+            b.setEmail(internet.emailAddress());
+            b.setImageUrl(internet.avatar());
+            ChuckNorris chuckNorris = faker.chuckNorris();
+            b.setDescription(chuckNorris.fact());
             bandmateDbRef.child(b.getId()).setValue(b);
             geoFire.setLocation(b.getId(), new GeoLocation(b.getLat(), b.getLon()), (key, error) -> {
                 if (error != null) {

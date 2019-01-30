@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,7 +36,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -44,10 +48,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -81,6 +88,8 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     Button logoutButton;
 
     private GoogleMap googleMap;
+    private HashMap<String, Marker> keyMarkerMap = new HashMap<>();
+    private Circle searchCircle;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private RecyclerView.LayoutManager layoutManager;
@@ -202,122 +211,87 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                 RC_SIGN_IN);
     }
 
+    private double zoomLevelToRadius(double zoomLevel) {
+        // Approximation to fit circle into view
+        return 591657550.5/Math.pow(2, zoomLevel-1);
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+        viewModel.setBandmates(new ArrayList<>());
+        adapter.notifyDataSetChanged();
+        LatLng center = googleMap.getCameraPosition().target;
+        double radius = zoomLevelToRadius(googleMap.getCameraPosition().zoom);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(center.latitude,center.longitude), radius);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
-            public void onCameraIdle() {
-                VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
-
-                LatLng farRight = visibleRegion.farRight;
-                LatLng farLeft = visibleRegion.farLeft;
-                LatLng nearRight = visibleRegion.nearRight;
-                LatLng nearLeft = visibleRegion.nearLeft;
-
-                float[] distanceWidth = new float[2];
-                Location.distanceBetween(
-                        (farRight.latitude+nearRight.latitude)/2,
-                        (farRight.longitude+nearRight.longitude)/2,
-                        (farLeft.latitude+nearLeft.latitude)/2,
-                        (farLeft.longitude+nearLeft.longitude)/2,
-                        distanceWidth
-                );
-
-
-                float[] distanceHeight = new float[2];
-                Location.distanceBetween(
-                        (farRight.latitude+nearRight.latitude)/2,
-                        (farRight.longitude+nearRight.longitude)/2,
-                        (farLeft.latitude+nearLeft.latitude)/2,
-                        (farLeft.longitude+nearLeft.longitude)/2,
-                        distanceHeight
-                );
-
-                float distance;
-
-                if (distanceWidth[0]>distanceHeight[0]){
-                    distance = distanceWidth[0];
-                } else {
-                    distance = distanceHeight[0];
-                }
-
-                LatLng center = googleMap.getCameraPosition().target;
-
-
-                Toast.makeText(getApplicationContext(),"CENTRO CAMERA: "+center.toString()+" RAGGIO CAMERA: "+distance/1000,Toast.LENGTH_LONG).show();
-
-                viewModel.setBandmates(new ArrayList<>());
-                adapter.notifyDataSetChanged();
-
-                GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(center.latitude,center.longitude), distance/1000);
-                geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            public void onKeyEntered(String key, GeoLocation location) {
+                //viewModel.setBandmateChildId(key);
+                DatabaseReference bandmateRef = firebaseDatabase.getReference(AppConfig.FIREBASE_DATABASE_BANDAMATES_DB_REF).child(key);
+                bandmateRef.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onKeyEntered(String key, GeoLocation location) {
-                        System.out.println("ENTERED" + firebaseDatabase.getReference(AppConfig.FIREBASE_DATABASE_BANDAMATES_DB_REF).child(key));
-                        viewModel.setBandmateChildId(key);
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Bandmate bandmate = dataSnapshot.getValue(Bandmate.class);
+                        viewModel.addBandmate(bandmate);
+                        adapter.notifyDataSetChanged();
+                        Marker m = googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(bandmate.getLat(),bandmate.getLon()))
+                                .title(bandmate.getName())
+                                .snippet(bandmate.getInstrument()));
+                        keyMarkerMap.put(key,m);
                     }
 
                     @Override
-                    public void onKeyExited(String key) {
-
-                    }
-
-                    @Override
-                    public void onKeyMoved(String key, GeoLocation location) {
-
-                    }
-
-                    @Override
-                    public void onGeoQueryReady() {
-
-                    }
-
-                    @Override
-                    public void onGeoQueryError(DatabaseError error) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
                 });
-                /*
-                bandmates.clear();
-                adapter.notifyDataSetChanged();
-                GeoQuery geoQuery = geoFirestore.queryAtLocation(new GeoPoint(center.latitude,center.longitude),distance/1000);
-                geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                DatabaseReference bandmateRef = firebaseDatabase.getReference(AppConfig.FIREBASE_DATABASE_BANDAMATES_DB_REF).child(key);
+                bandmateRef.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDocumentEntered(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
-                        Bandmate bandmate =documentSnapshot.toObject(Bandmate.class);
-                        bandmates.add(bandmate);
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(bandmate.getLatlon().getLatitude(),bandmate.getLatlon().getLongitude()))
-                                .title(bandmate.getName())
-                                .snippet(bandmate.getInstrument()));
-                    }
-
-                    @Override
-                    public void onDocumentExited(DocumentSnapshot documentSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onDocumentMoved(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
-
-                    }
-
-                    @Override
-                    public void onDocumentChanged(DocumentSnapshot documentSnapshot, GeoPoint geoPoint) {
-
-                    }
-
-                    @Override
-                    public void onGeoQueryReady() {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Bandmate bandmate = dataSnapshot.getValue(Bandmate.class);
+                        viewModel.removeBandmate(bandmate);
                         adapter.notifyDataSetChanged();
+
                     }
 
                     @Override
-                    public void onGeoQueryError(Exception e) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
-                });*/
+                });
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+
+        googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                LatLng center = googleMap.getCameraPosition().target;
+                double radius = zoomLevelToRadius(googleMap.getCameraPosition().zoom);
+                Toast.makeText(getApplicationContext(),"CENTER: " + center.latitude + "," + center.longitude + "- ZOOM: " + googleMap.getCameraPosition().zoom + " - RADIUS: "+radius,Toast.LENGTH_SHORT).show();
+                geoQuery.setCenter(new GeoLocation(center.latitude,center.longitude));
+                geoQuery.setRadius(radius);
             }
         });
     }

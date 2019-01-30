@@ -54,6 +54,10 @@ public class SearchBandmatesViewModel extends ViewModel {
         this.bandmates.add(bandmate);
     }
 
+    public void removeBandmate(Bandmate bandmate){
+        this.bandmates.remove(bandmate);
+    }
+
     public void generateBandmates(int howMany){
         bandmatesRepository.generateBandmates(howMany);
     }

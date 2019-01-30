@@ -10,10 +10,13 @@ public class Bandmate {
 
     private String id;
     private String name;
+    private String imageUrl;
     private int age;
     private String instrument;
     private String location;
     private Boolean publicProfile;
     private double lat;
     private double lon;
+    private String description;
+    private String email;
 }
