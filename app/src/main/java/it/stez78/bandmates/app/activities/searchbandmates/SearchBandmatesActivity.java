@@ -5,12 +5,12 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.Status;
@@ -37,15 +36,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -67,10 +63,11 @@ import dagger.android.support.HasSupportFragmentInjector;
 import it.stez78.bandmates.AppConfig;
 import it.stez78.bandmates.R;
 import it.stez78.bandmates.app.adapters.BandmateAdapter;
+import it.stez78.bandmates.app.adapters.OnBandmateAdapterItemClickListener;
+import it.stez78.bandmates.app.fragments.bandmatepreviewdialog.BandmatePreviewDialogFragment;
 import it.stez78.bandmates.model.Bandmate;
-import timber.log.Timber;
 
-public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback {
+public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback, OnBandmateAdapterItemClickListener {
 
     private final static String TAG = SearchBandmatesActivity.class.getSimpleName();
     private final static int RC_SIGN_IN = 1;
@@ -150,7 +147,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BandmateAdapter(this, viewModel.getBandmates());
+        adapter = new BandmateAdapter(this, viewModel.getBandmates(),this);
         recyclerView.setAdapter(adapter);
 
         viewModel.getBandmateLiveData().observe(this, new Observer<Bandmate>() {
@@ -331,5 +328,20 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
         return dispatchingAndroidInjector;
+    }
+
+    @Override
+    public void onBandmateAdapterItemClick(Bandmate item) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(BandmatePreviewDialogFragment.TAG);
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        BandmatePreviewDialogFragment bandmatePreviewDialogFragment = new BandmatePreviewDialogFragment();
+        Bundle params = new Bundle();
+        params.putParcelable(BandmatePreviewDialogFragment.BANDMATE_KEY, item);
+        bandmatePreviewDialogFragment.setArguments(params);
+        bandmatePreviewDialogFragment.show(ft, BandmatePreviewDialogFragment.TAG);
     }
 }

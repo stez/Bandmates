@@ -8,6 +8,7 @@ import dagger.Module;
 import dagger.multibindings.IntoMap;
 import it.stez78.bandmates.BandmatesAppViewModelFactory;
 import it.stez78.bandmates.app.activities.searchbandmates.SearchBandmatesViewModel;
+import it.stez78.bandmates.app.fragments.bandmatepreviewdialog.BandmatePreviewDialogViewModel;
 
 @Module
 abstract class ViewModelModule {
@@ -16,6 +17,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(SearchBandmatesViewModel.class)
     abstract ViewModel bindSearchBandmatesViewModel(SearchBandmatesViewModel searchBandmatesViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(BandmatePreviewDialogViewModel.class)
+    abstract ViewModel bindBandmatePreviewDialogViewModel(BandmatePreviewDialogViewModel bandmatePreviewDialogViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(BandmatesAppViewModelFactory factory);

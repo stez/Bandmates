@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Bandmates</string>
     <string name="title_activity_maps">Map</string>
+    <string name="bandmate_contact">Contact</string>
+    <string name="bandmate_detail">Details</string>
+    <string name="content_description_user_avatar">User Avatar</string>
+    <string name="dialog_bandmate_preview_opening_error">Something went wrong opening bandmate preview..</string>
 </resources>

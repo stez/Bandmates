@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.storage.FirebaseStorage;
@@ -24,9 +25,11 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
 
     private Context ctx;
     private List<Bandmate> bandmates;
+    private OnBandmateAdapterItemClickListener clickListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        private LinearLayout container;
         private TextView name;
         private TextView age;
         private TextView location;
@@ -35,6 +38,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
 
         public ViewHolder(View rootView) {
             super(rootView);
+            container = rootView.findViewById(R.id.list_element_bandmate_container);
             name = rootView.findViewById(R.id.list_element_bandmate_name);
             age = rootView.findViewById(R.id.list_element_bandmate_age);
             location = rootView.findViewById(R.id.list_element_bandmate_location);
@@ -59,11 +63,16 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         }
 
         public ImageView getBg() { return bg; }
+
+        public void bind(final Bandmate item, final OnBandmateAdapterItemClickListener listener) {
+            container.setOnClickListener(v -> listener.onBandmateAdapterItemClick(item));
+        }
     }
 
-    public BandmateAdapter(Context ctx, List<Bandmate> bandmates) {
+    public BandmateAdapter(Context ctx, List<Bandmate> bandmates, OnBandmateAdapterItemClickListener listener) {
         this.ctx = ctx;
         this.bandmates = bandmates;
+        this.clickListener = listener;
     }
 
     @Override
@@ -102,6 +111,7 @@ public class BandmateAdapter extends RecyclerView.Adapter<BandmateAdapter.ViewHo
         GlideApp.with(ctx)
                 .load(storageRef)
                 .into(holder.getBg());
+        holder.bind(bandmate, clickListener);
     }
 
     @Override
