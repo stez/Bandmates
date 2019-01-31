@@ -22,7 +22,6 @@ class AppModule {
     @Provides
     @Singleton
     Picasso providePicasso(Application ctx) {
-
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 

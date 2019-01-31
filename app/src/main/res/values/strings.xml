@@ -5,4 +5,9 @@
     <string name="bandmate_detail">Details</string>
     <string name="content_description_user_avatar">User Avatar</string>
     <string name="dialog_bandmate_preview_opening_error">Something went wrong opening bandmate preview..</string>
+    <string name="bandmate_contact_email_subject">Hi from Bandmates!!</string>
+    <string name="bandmate_age">%1d years old</string>
+    <string name="bandmate_detail_location_label">Location</string>
+    <string name="bandmate_details_age_label">Age</string>
+    <string name="bandmate_details_about_label">About me</string>
 </resources>

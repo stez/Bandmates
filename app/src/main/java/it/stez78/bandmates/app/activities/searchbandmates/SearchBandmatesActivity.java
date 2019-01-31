@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -69,7 +71,7 @@ import it.stez78.bandmates.model.Bandmate;
 
 public class SearchBandmatesActivity extends AppCompatActivity implements HasSupportFragmentInjector, OnMapReadyCallback, OnBandmateAdapterItemClickListener {
 
-    private final static String TAG = SearchBandmatesActivity.class.getSimpleName();
+    private final static String TAG = "searchBandmatesActivity";
     private final static int RC_SIGN_IN = 1;
 
     @Inject
@@ -343,5 +345,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         params.putParcelable(BandmatePreviewDialogFragment.BANDMATE_KEY, item);
         bandmatePreviewDialogFragment.setArguments(params);
         bandmatePreviewDialogFragment.show(ft, BandmatePreviewDialogFragment.TAG);
+
     }
 }
