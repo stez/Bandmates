@@ -342,7 +342,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         ft.addToBackStack(null);
         BandmatePreviewDialogFragment bandmatePreviewDialogFragment = new BandmatePreviewDialogFragment();
         Bundle params = new Bundle();
-        params.putParcelable(BandmatePreviewDialogFragment.BANDMATE_KEY, item);
+        params.putParcelable(Bandmate.BANDMATE_PARCELABLE_KEY, item);
         bandmatePreviewDialogFragment.setArguments(params);
         bandmatePreviewDialogFragment.show(ft, BandmatePreviewDialogFragment.TAG);
 

@@ -30,7 +30,6 @@ import it.stez78.bandmates.model.Bandmate;
 public class BandmatePreviewDialogFragment extends AppCompatDialogFragment implements Injectable {
 
     public static final String TAG = "bandmatePreviewDialogFragment";
-    public static final String BANDMATE_KEY = "bandmateKey";
 
     @BindView(R.id.dialog_bandmate_preview_avatar)
     ImageView avatar;
@@ -78,8 +77,8 @@ public class BandmatePreviewDialogFragment extends AppCompatDialogFragment imple
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(BandmatePreviewDialogViewModel.class);
         Bundle args = getArguments();
-        if (args != null && args.getParcelable(BANDMATE_KEY) != null) {
-            viewModel.init(args.getParcelable(BANDMATE_KEY));
+        if (args != null && args.getParcelable(Bandmate.BANDMATE_PARCELABLE_KEY) != null) {
+            viewModel.init(args.getParcelable(Bandmate.BANDMATE_PARCELABLE_KEY));
             populateViews();
         } else {
             Toast.makeText(getContext(), R.string.dialog_bandmate_preview_opening_error, Toast.LENGTH_SHORT).show();
@@ -109,6 +108,7 @@ public class BandmatePreviewDialogFragment extends AppCompatDialogFragment imple
     @OnClick(R.id.dialog_bandmate_preview_button_details)
     public void openBandmateDetails(){
         Intent intent = new Intent(getContext(), BandmateDetailsActivity.class);
+        intent.putExtra(Bandmate.BANDMATE_PARCELABLE_KEY, viewModel.getBandmate());
         startActivity(intent);
     }
 }

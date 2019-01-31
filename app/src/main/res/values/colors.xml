@@ -2,7 +2,7 @@
 <resources>
     <color name="primaryColor">#FAFAFA</color>
     <color name="primaryLightColor">#ffffff</color>
-    <color name="primaryDarkColor">#c7c7c7</color>
+    <color name="primaryDarkColor">#C7C7C7</color>
     <color name="secondaryColor">#FF2D38</color>
     <color name="secondaryLightColor">#ff6b63</color>
     <color name="secondaryDarkColor">#c30010</color>
@@ -10,6 +10,7 @@
     <color name="secondaryTextColor">#000000</color>
 
     <color name="backgroundColor">#ddd</color>
+    <color name="blackTransparent">#80000000</color>
     <color name="whiteTransparent">#c8ffffff</color>
 
 </resources>

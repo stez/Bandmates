@@ -5,6 +5,7 @@ import android.app.Application;
 import com.firebase.geofire.GeoFire;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
@@ -37,7 +38,9 @@ class AppModule {
 
     @Provides
     @Singleton
-    FirebaseDatabase provideDatabase() { return FirebaseDatabase.getInstance(); }
+    FirebaseDatabase provideDatabase() {
+        return FirebaseDatabase.getInstance();
+    }
 
     @Provides
     @Singleton
@@ -47,6 +50,14 @@ class AppModule {
 
     @Provides
     @Singleton
-    FirebaseAuth provideFirebaseAuth() { return FirebaseAuth.getInstance(); }
+    FirebaseStorage provideFirebaseStorage() {
+        return FirebaseStorage.getInstance();
+    }
+
+    @Provides
+    @Singleton
+    FirebaseAuth provideFirebaseAuth() {
+        return FirebaseAuth.getInstance();
+    }
 
 }
