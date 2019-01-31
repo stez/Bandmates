@@ -4,21 +4,23 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -37,7 +39,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -86,9 +87,11 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @BindView(R.id.activity_search_bandmates_logout_button)
     Button logoutButton;
 
+    @BindView(R.id.activity_search_bandmates_bottom_nav)
+    BottomNavigationView bottomNavigationView;
+
     private GoogleMap googleMap;
     private HashMap<String, Marker> keyMarkerMap = new HashMap<>();
-    private Circle searchCircle;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private RecyclerView.LayoutManager layoutManager;
@@ -179,11 +182,13 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     private void toolbarForAuthenticatedUser(){
         toolbar.getMenu().findItem(R.id.menu_profile_login).setVisible(false);
         toolbar.getMenu().findItem(R.id.menu_profile).setVisible(true);
+        bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     private void toolbarForVisitors(){
         toolbar.getMenu().findItem(R.id.menu_profile_login).setVisible(true);
         toolbar.getMenu().findItem(R.id.menu_profile).setVisible(false);
+        bottomNavigationView.setVisibility(View.GONE);
     }
 
     public void logout(){
@@ -307,12 +312,32 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
             case R.id.menu_profile_populatedata:
                 Random random = new Random();
                 int howMany = random.nextInt(100)+1;
-                viewModel.generateBandmates(howMany);
-                Toast.makeText(this,"Generating "+howMany+" new Bandmates!",Toast.LENGTH_LONG).show();
+                showRandomDataDialog(howMany);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showRandomDataDialog(int howMany){
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.random_data_title)
+                .setMessage(getString(R.string.generate_random_data_message, howMany))
+                .setPositiveButton(R.string.yes_please, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),getString(R.string.generating_random_data,howMany),Toast.LENGTH_LONG).show();
+                        viewModel.generateBandmates(howMany);
+                    }
+                })
+                .setNegativeButton(R.string.no_thanks, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
     @Override

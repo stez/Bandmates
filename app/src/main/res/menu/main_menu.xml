@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/menu_profile_populatedata"
-        android:icon="@drawable/ic_android_black_24dp"
+        android:icon="@drawable/ic_group_add_secondary_24dp"
         app:showAsAction="ifRoom"
         android:title="Generate Data">
     </item>

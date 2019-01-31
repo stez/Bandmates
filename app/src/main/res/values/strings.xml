@@ -11,4 +11,9 @@
     <string name="bandmate_details_age_label">Age</string>
     <string name="bandmate_details_about_label">About me</string>
     <string name="bandmate_profile_title">Bandmate Profile</string>
+    <string name="random_data_title">Let\'s add some new friends!</string>
+    <string name="generate_random_data_message">Do you want to generate %1d random Bandmates??</string>
+    <string name="yes_please">Yes, please</string>
+    <string name="no_thanks">No, thanks</string>
+    <string name="generating_random_data">Generating %1d new Bandmates!</string>
 </resources>

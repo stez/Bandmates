@@ -3,8 +3,6 @@ package it.stez78.bandmates.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import lombok.Data;
-
 /**
  * Created by Stefano Zanotti on 03/09/2018.
  */

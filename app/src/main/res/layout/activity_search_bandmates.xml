@@ -95,7 +95,7 @@
         app:layout_constraintTop_toTopOf="@+id/activity_search_bandmates_map" />
 
     <android.support.design.widget.BottomNavigationView
-        android:id="@+id/main_activity_bottom_nav"
+        android:id="@+id/activity_search_bandmates_bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/whiteTransparent"
