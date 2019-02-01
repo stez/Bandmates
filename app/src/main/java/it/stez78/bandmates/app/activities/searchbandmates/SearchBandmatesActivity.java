@@ -1,17 +1,14 @@
 package it.stez78.bandmates.app.activities.searchbandmates;
 
 import android.Manifest;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -46,9 +43,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,7 +55,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
@@ -125,6 +118,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         setContentView(R.layout.activity_search_bandmates);
         ButterKnife.bind(this);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SearchBandmatesViewModel.class);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.activity_search_bandmates_map);
         mapFragment.getMapAsync(this);
         setupPlaceAutocompleteFragment();
@@ -138,8 +132,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         }
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BandmateAdapter(this, viewModel.getBandmates(),this);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -235,6 +227,8 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         viewModel.setBandmates(new ArrayList<>());
+        adapter = new BandmateAdapter(this, viewModel.getBandmates(),this);
+        recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         LatLng center = googleMap.getCameraPosition().target;
         double radius = 1000;

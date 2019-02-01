@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.github.javafaker.Address;
-import com.github.javafaker.ChuckNorris;
 import com.github.javafaker.Faker;
 import com.github.javafaker.Internet;
 import com.github.javafaker.Lorem;

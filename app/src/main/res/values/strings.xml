@@ -16,4 +16,12 @@
     <string name="yes_please">Yes, please</string>
     <string name="no_thanks">No, thanks</string>
     <string name="generating_random_data">Generating %1d new Bandmates!</string>
+    <string name="your_location">Your Location</string>
+    <string name="location_not_available">Bandmates cannot access your location!</string>
+    <string name="no_result">No results available</string>
+    <string name="waiting_location">Waiting for Location</string>
+    <plurals name="bandmate_search_total_result">
+        <item quantity="one">%d BANDMATE</item>
+        <item quantity="other">%d BANDMATES</item>
+    </plurals>
 </resources>
