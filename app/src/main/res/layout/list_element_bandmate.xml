@@ -25,7 +25,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@color/secondaryLightColor" />
+                app:srcCompat="@color/secondaryLightColor"
+                android:contentDescription="@string/content_description_instrument_banner"/>
 
             <ImageView
                 android:id="@+id/imageView2"
@@ -35,7 +36,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/transparent_fading_background" />
+                app:srcCompat="@drawable/transparent_fading_background"
+                android:importantForAccessibility="no"/>
 
             <TextView
                 android:id="@+id/list_element_bandmate_name"

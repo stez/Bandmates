@@ -5,12 +5,12 @@
         android:id="@+id/menu_profile"
         android:icon="@drawable/ic_person_secondary_24dp"
         app:showAsAction="ifRoom"
-        android:title="Profile">
+        android:title="@string/profile">
         <menu xmlns:android="http://schemas.android.com/apk/res/android">
             <item android:id="@+id/menu_profile_popup_settings"
-                android:title="Settings" />
+                android:title="@string/settings" />
             <item android:id="@+id/menu_profile_popup_logout"
-                android:title="Logout"/>
+                android:title="@string/logout"/>
         </menu>
     </item>
 
@@ -18,13 +18,13 @@
         android:id="@+id/menu_profile_login"
         android:icon="@drawable/ic_person_primary_24dp"
         app:showAsAction="ifRoom"
-        android:title="Profile">
+        android:title="@string/profile">
     </item>
 
     <item
         android:id="@+id/menu_profile_populatedata"
         android:icon="@drawable/ic_group_add_secondary_24dp"
         app:showAsAction="ifRoom"
-        android:title="Generate Data">
+        android:title="@string/generate_data">
     </item>
 </menu>
