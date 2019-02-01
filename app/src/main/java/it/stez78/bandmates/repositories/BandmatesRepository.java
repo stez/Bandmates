@@ -11,6 +11,7 @@ import com.github.javafaker.Address;
 import com.github.javafaker.ChuckNorris;
 import com.github.javafaker.Faker;
 import com.github.javafaker.Internet;
+import com.github.javafaker.Lorem;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -89,30 +90,35 @@ public class BandmatesRepository {
     public void generateBandmates(int howMany){
         String[] instruments = {"guitar","drums","bass","keyboard","vocals"};
         Faker faker = new Faker(new Locale("it"));
-        for(int i = 0 ; i < howMany ; i++){
-            Bandmate b = new Bandmate();
-            b.setId(UUID.randomUUID().toString());
-            b.setAge(new Random().nextInt(20) + 30);
-            b.setName(faker.name().fullName());
-            b.setInstrument(instruments[new Random().nextInt(5)]);
-            b.setPublicProfile(true);
-            Address address = faker.address();
-            b.setLat(Double.valueOf(address.latitude().replace(decimalSeparator, '.')));
-            b.setLon(Double.valueOf(address.longitude().replace(decimalSeparator, '.')));
-            b.setLocation(address.cityName());
-            Internet internet = faker.internet();
-            b.setEmail(internet.emailAddress());
-            b.setImageUrl(internet.avatar());
-            ChuckNorris chuckNorris = faker.chuckNorris();
-            b.setDescription(chuckNorris.fact());
-            bandmateDbRef.child(b.getId()).setValue(b);
-            geoFire.setLocation(b.getId(), new GeoLocation(b.getLat(), b.getLon()), (key, error) -> {
-                if (error != null) {
-                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                } else {
-                    System.out.println("Location saved on server successfully!");
+        new AppExecutors().networkIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < howMany; i++) {
+                    Bandmate b = new Bandmate();
+                    b.setId(UUID.randomUUID().toString());
+                    b.setAge(new Random().nextInt(20) + 30);
+                    b.setName(faker.name().fullName());
+                    b.setInstrument(instruments[new Random().nextInt(5)]);
+                    b.setPublicProfile(true);
+                    Address address = faker.address();
+                    b.setLat(Double.valueOf(address.latitude().replace(decimalSeparator, '.')));
+                    b.setLon(Double.valueOf(address.longitude().replace(decimalSeparator, '.')));
+                    b.setLocation(address.cityName());
+                    Internet internet = faker.internet();
+                    b.setEmail(internet.emailAddress());
+                    b.setImageUrl(internet.avatar());
+                    Lorem lorem = faker.lorem();
+                    b.setDescription(lorem.paragraph());
+                    bandmateDbRef.child(b.getId()).setValue(b);
+                    geoFire.setLocation(b.getId(), new GeoLocation(b.getLat(), b.getLon()), (key, error) -> {
+                        if (error != null) {
+                            System.err.println("There was an error saving the location to GeoFire: " + error);
+                        } else {
+                            System.out.println("Location saved on server successfully!");
+                        }
+                    });
                 }
-            });
-        }
+            }
+        });
     }
 }

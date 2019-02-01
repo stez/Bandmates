@@ -53,8 +53,13 @@ public class SearchBandmatesViewModel extends ViewModel {
         this.bandmates.add(bandmate);
     }
 
-    public void removeBandmate(Bandmate bandmate){
-        this.bandmates.remove(bandmate);
+    public void removeBandmateById(String bandmateId){
+        List<Bandmate> removeList = new ArrayList<>(this.bandmates);
+        for (Bandmate b : removeList){
+            if (b.getId().equals(bandmateId)){
+                this.bandmates.remove(b);
+            }
+        }
     }
 
     public void generateBandmates(int howMany){
