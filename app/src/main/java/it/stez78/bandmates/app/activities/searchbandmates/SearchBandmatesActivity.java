@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -122,6 +123,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         mapFragment.getMapAsync(this);
         setupPlaceAutocompleteFragment();
         setSupportActionBar(toolbar);
+        setUpBottomNavigation();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, RC_PERMISSION_LOCATION);
@@ -303,6 +305,26 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         }
     }
 
+    private void setUpBottomNavigation() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.bottom_search:
+                        break;
+                    case R.id.bottom_profile:
+                        Toast.makeText(getApplicationContext(), R.string.available_soon,Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.bottom_messages:
+                        Toast.makeText(getApplicationContext(), R.string.available_soon,Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
     private void showRandomDataDialog(int howMany){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.random_data_title)
@@ -311,7 +333,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getApplicationContext(),getString(R.string.generating_random_data,howMany),Toast.LENGTH_LONG).show();
-                        viewModel.generateBandmates(howMany);
+                        new GenerateBandmatesAsynctask().execute(howMany);
                     }
                 })
                 .setNegativeButton(R.string.no_thanks, new DialogInterface.OnClickListener() {
@@ -354,5 +376,19 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     @Override
     public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
         return dispatchingAndroidInjector;
+    }
+
+    private class GenerateBandmatesAsynctask extends AsyncTask<Integer, Void, Void> {
+
+        protected void onPreExecute() {
+        }
+
+        protected Void doInBackground(Integer... howMany) {
+            viewModel.generateBandmates(howMany[0]);
+            return null;
+        }
+        protected void onPostExecute(Void unused) {
+            Toast.makeText(getApplicationContext(), R.string.done,Toast.LENGTH_LONG).show();
+        }
     }
 }

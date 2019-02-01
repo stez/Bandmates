@@ -51,7 +51,7 @@ public class SearchBandmatesViewModel extends ViewModel {
     }
 
     public void generateBandmates(int howMany){
-        bandmatesRepository.generateBandmates(howMany);
+        bandmatesRepository.generateBandmatesSync(howMany);
     }
 
 }
