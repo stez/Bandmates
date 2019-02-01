@@ -48,8 +48,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="near you (50 km radius)"
-            android:textSize="10sp"
+            android:text="@string/near_you_50_km_radius"
+            android:textSize="12sp"
             android:gravity="center"
             android:textColor="@color/secondaryColor"/>
 

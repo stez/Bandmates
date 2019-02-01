@@ -10,7 +10,6 @@ public class Bandmate implements Parcelable {
 
     public static final String BANDMATE_PARCELABLE_KEY = "bandmateKey";
 
-
     private String id;
     private String name;
     private String imageUrl;

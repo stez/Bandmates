@@ -20,6 +20,9 @@
     <string name="location_not_available">Bandmates cannot access your location!</string>
     <string name="no_result">No results available</string>
     <string name="waiting_location">Waiting for Location</string>
+    <string name="updating">updating data ...</string>
+    <string name="content_description_instrument_banner">Banner image of the instrument</string>
+    <string name="near_you_50_km_radius">near you (50 km radius)</string>
     <plurals name="bandmate_search_total_result">
         <item quantity="one">%d BANDMATE</item>
         <item quantity="other">%d BANDMATES</item>

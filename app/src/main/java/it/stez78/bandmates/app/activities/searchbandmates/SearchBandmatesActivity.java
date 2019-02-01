@@ -93,7 +93,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
     BottomNavigationView bottomNavigationView;
 
     private GoogleMap googleMap;
-    private HashMap<String, Marker> keyMarkerMap = new HashMap<>();
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private RecyclerView.LayoutManager layoutManager;
@@ -209,18 +208,13 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
     private void moveCameraToCurrentPosition(){
         fusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        LatLng newCameraPosition = new LatLng(location.getLatitude(),location.getLongitude());
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 5f));
-                    }
+            .addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    LatLng newCameraPosition = new LatLng(location.getLatitude(),location.getLongitude());
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 5f));
+                }
         });
-    }
-
-    private double zoomLevelToRadius(double zoomLevel) {
-        // Approximation
-        return 591657550.5/Math.pow(2, zoomLevel-1);
     }
 
     @Override
@@ -236,7 +230,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                Timber.d("GEOFIRE ENTERED "+key);
                 DatabaseReference bandmateRef = firebaseDatabase.getReference(AppConfig.FIREBASE_DATABASE_BANDAMATES_DB_REF).child(key);
                 bandmateRef.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -244,11 +237,10 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
                         Bandmate bandmate = dataSnapshot.getValue(Bandmate.class);
                         viewModel.addBandmate(bandmate);
                         adapter.notifyDataSetChanged();
-                        Marker m = googleMap.addMarker(new MarkerOptions()
+                        googleMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(bandmate.getLat(),bandmate.getLon()))
                                 .title(bandmate.getName())
                                 .snippet(bandmate.getInstrument()));
-                        keyMarkerMap.put(key,m);
                     }
 
                     @Override
@@ -260,7 +252,6 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
 
             @Override
             public void onKeyExited(String key) {
-                Timber.d("GEOFIRE EXITED "+key);
                 viewModel.removeBandmateById(key);
                 adapter.notifyDataSetChanged();
 
@@ -287,7 +278,7 @@ public class SearchBandmatesActivity extends AppCompatActivity implements HasSup
             double distance = SphericalUtil.computeDistanceBetween(
                     visibleRegion.farLeft, googleMap.getCameraPosition().target);
             LatLng center1 = googleMap.getCameraPosition().target;
-            Toast.makeText(getApplicationContext(),"CENTER: " + center1.latitude + "," + center1.longitude + "- ZOOM: " + googleMap.getCameraPosition().zoom + " - DISTANCE: "+ distance/1000,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.updating,Toast.LENGTH_SHORT).show();
             geoQuery.setCenter(new GeoLocation(center1.latitude, center1.longitude));
             geoQuery.setRadius(distance/1000);
         });
